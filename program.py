@@ -2,6 +2,7 @@ import cv2
 import tensorflow as tf
 from deep_sort_realtime.deepsort_tracker import DeepSort
 from collections import deque
+from onvif import ONVIFCamera
 
 # Inicjalizacja detektora obiektów (np. TensorFlow SSD, YOLO lub Faster R-CNN)
 model_path = 'ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model'
@@ -31,8 +32,26 @@ def track_objects(frame, detections):
     return tracks
 
 # Ustawienia kamery
-camera_url = "http://admin:Borsuk44@10.12.10.59:80/Streaming/Channels/101"  # Przykładowy adres HTTP
-cap = cv2.VideoCapture(camera_url)
+# camera_url = "rtsp://admin:Borsuk44@10.12.10.60/Streaming/Channels/101"  # Przykładowy adres HTTP
+# cap = cv2.VideoCapture(camera_url)
+# Konfiguracja kamery
+IP = "10.12.10.58"
+PORT = 80
+USER = "admin"  # Domyślna nazwa użytkownika
+PASS = "Borsuk44"  # Domyślne hasło
+
+# Inicjalizacja kamery ONVIF
+mycam = ONVIFCamera(IP, PORT, USER, PASS)
+
+# Pobieranie adresu strumienia RTSP
+media_service = mycam.create_media_service()
+profiles = media_service.GetProfiles()
+token = profiles[0].token
+stream_uri = media_service.GetStreamUri({'StreamSetup': {'Stream': 'RTP-Unicast', 'Transport': 'RTSP'}, 'ProfileToken': token})
+
+# Otwarcie strumienia RTSP
+cap = cv2.VideoCapture(stream_uri.Uri)
+
 
 while True:
     ret, frame = cap.read()
@@ -57,9 +76,7 @@ while True:
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)  # Rysujemy prostokąt
             cv2.putText(frame, f"ID: {track.track_id}", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
-    # Wyświetlanie obrazu
-    cv2.imshow('Tracking', frame)
-
+    # Wyświetlanie obra
     # Wyjście po naciśnięciu 'q'
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break

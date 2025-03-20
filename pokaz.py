@@ -24,6 +24,7 @@ while True:
     if not ret:
         print("Nie można odczytać strumienia wideo")
         break
+    print("Odczytano klatkę")
 
     # Wyświetlanie obrazu
     cv2.imshow('Podgląd kamery', frame)
