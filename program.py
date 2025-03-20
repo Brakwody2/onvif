@@ -4,7 +4,15 @@ from deep_sort_realtime.deepsort_tracker import DeepSort
 from collections import deque
 
 # Inicjalizacja detektora obiektów (np. TensorFlow SSD, YOLO lub Faster R-CNN)
-model = tf.saved_model.load('ssd_mobilenet_v2_coco/saved_model')  # Przykład modelu SSD
+model_path = 'ssd_mobilenet_v2_fpnlite_320x320_coco17_tpu-8/saved_model'
+
+# Załaduj model
+model = tf.saved_model.load(model_path)
+
+
+
+# Przykład modelu SSD
+
 
 # Inicjalizacja DeepSORT
 deepsort = DeepSort()
@@ -23,9 +31,7 @@ def track_objects(frame, detections):
     return tracks
 
 # Ustawienia kamery
-camera_url = "http://admin:Borsuk44@10.12.10.59:80/Streaming/Channels/1"  # Przykładowy adres HTTP
-cap = cv2.VideoCapture(camera_url)
-camera_url = "rtsp://admin:Borsuk44@10.12.10.59:554/Streaming/Channels/1"  # Przykładowy adres RTSP
+camera_url = "http://admin:Borsuk44@10.12.10.59:80/Streaming/Channels/101"  # Przykładowy adres HTTP
 cap = cv2.VideoCapture(camera_url)
 
 while True:
